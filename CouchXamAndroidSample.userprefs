@@ -2,12 +2,12 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.Workbench ActiveDocument="CouchXamAndroidSample/MainActivity.cs">
     <Files>
-      <File FileName="CouchXamAndroidSample/MainActivity.cs" Line="27" Column="51" />
-      <File FileName="../CouchBaseLiteTest/CouchBaseLiteTest/MainActivity.cs" Line="131" Column="3" />
+      <File FileName="CouchXamAndroidSample/MainActivity.cs" Line="32" Column="33" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.ItemProperties.CouchXamAndroidSample MonoForAntroid.PreferredDevice="3.7&quot; WVGA (Nexus One)" />
 </Properties>

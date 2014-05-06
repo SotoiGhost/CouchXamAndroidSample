@@ -149,6 +149,18 @@ namespace CouchXamAndroidSample
 		public partial class Id
 		{
 			
+			// aapt resource value: 0x7f060006
+			public const int btnCount = 2131099654;
+			
+			// aapt resource value: 0x7f060007
+			public const int btnGC = 2131099655;
+			
+			// aapt resource value: 0x7f060004
+			public const int btnReplicate = 2131099652;
+			
+			// aapt resource value: 0x7f060005
+			public const int btnStop = 2131099653;
+			
 			// aapt resource value: 0x7f060002
 			public const int loadingImage = 2131099650;
 			
@@ -157,9 +169,6 @@ namespace CouchXamAndroidSample
 			
 			// aapt resource value: 0x7f060003
 			public const int loadingProgressWheel = 2131099651;
-			
-			// aapt resource value: 0x7f060004
-			public const int myButton = 2131099652;
 			
 			// aapt resource value: 0x7f060001
 			public const int textViewStatus = 2131099649;
@@ -207,6 +216,18 @@ namespace CouchXamAndroidSample
 			
 			// aapt resource value: 0x7f040001
 			public const int hello = 2130968577;
+			
+			// aapt resource value: 0x7f040005
+			public const int lbl_btn_count = 2130968581;
+			
+			// aapt resource value: 0x7f040006
+			public const int lbl_btn_gc = 2130968582;
+			
+			// aapt resource value: 0x7f040003
+			public const int lbl_btn_replicate = 2130968579;
+			
+			// aapt resource value: 0x7f040004
+			public const int lbl_btn_stop = 2130968580;
 			
 			// aapt resource value: 0x7f040000
 			public const int library_name = 2130968576;

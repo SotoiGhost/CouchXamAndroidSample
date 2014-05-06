@@ -8,14 +8,13 @@ using Android.Widget;
 using Android.OS;
 using Couchbase.Lite;
 using Couchbase.Lite.Util;
-using AndroidHUD;
+//using AndroidHUD;
 using System.IO;
 
 namespace CouchXamAndroidSample
 {
 	[Activity (Label = "CouchXamAndroidSample", MainLauncher = true)]
-	public class MainActivity : Activity
-	{
+	public class MainActivity : Activity, Android.Views.View.IOnClickListener {
 		//		int count = 1;
 		public const string Tag = "LiteTestCase";
 		Manager manager = null;
@@ -23,110 +22,185 @@ namespace CouchXamAndroidSample
 		Replication repls = null;
 		string RemoteURLDBName;
 		string RemoteDBName;
+		Button btnReplicate, btnStop, btnCount;
 
 		protected override void OnCreate (Bundle bundle)
 		{
 			base.OnCreate (bundle);
 
-			#warning "Set your URL and DB name"
-			RemoteURLDBName = @"URL";
-			RemoteDBName = @"DBName";
-
+			RemoteURLDBName = @"http://192.168.15.20:5984/db1";
+			RemoteDBName = @"db_test1"; //3500 rows
+			
 			// Set our view from the "main" layout resource
 			SetContentView (Resource.Layout.Main);
 
 			// Get our button from the layout resource,
 			// and attach an event to it
-			Button button = FindViewById<Button> (Resource.Id.myButton);
+			btnReplicate = FindViewById<Button> (Resource.Id.btnReplicate);
+			btnStop = FindViewById<Button> (Resource.Id.btnStop);
+			btnCount = FindViewById<Button> (Resource.Id.btnCount);
+			Button btnGC = FindViewById<Button> (Resource.Id.btnGC);
 
-			button.Click += delegate {
-				//				button.Text = string.Format ("{0} clicks!", count++);
+			btnReplicate.SetOnClickListener (this);
+			btnStop.SetOnClickListener (this);
+			btnCount.SetOnClickListener (this);
+			btnGC.SetOnClickListener (this);
 
-				if (repls == null) {
-					StartCBLite();
-					database = GetDatabase(RemoteDBName);
-					repls = database.CreatePullReplication(new Uri(RemoteURLDBName));
+			StartCBLite ();
+			database = GetDatabase (RemoteDBName);
+			repls = CreatePullReplication ();
 
-					repls.Changed += (object sender, Replication.ReplicationChangeEventArgs e) => {
-						Replication replication = e.Source;
-
-						if (replication == null) return;
-
-						//						Console.WriteLine("Replication : " + replication + " changed.");
-						if (!replication.IsRunning) {
-							//							String msg = String.Format("Replicator {0} not running", replication);
-							AndHUD.Shared.Dismiss (this);
-							Console.WriteLine ("I'm not Running");
-						}
-						else {
-							float processed = (float)replication.CompletedChangesCount;
-							float total = (float)replication.ChangesCount;
-							float progress = processed / total * 100;
-
-							String msg = String.Format("Replicator processed {0} / {1}", processed, total);
-
-							if (processed >= total) {
-								AndHUD.Shared.Dismiss (this);
-							} else {
-								AndHUD.Shared.Show (context: this, status: "Downloading " + progress.ToString () + "%", progress: (int)progress);
-							}
-
-							Console.WriteLine (msg);
-						}
-					};
-
-					repls.Start();
-				}
-
-			};
+			repls.Changed += HandleChanged;
 
 		}
 
-		void StartCBLite()
-		{
-			string serverPath = GetServerPath();
-			var path = new DirectoryInfo(serverPath);
 
-			if (path.Exists)
-				path.Delete(true);
+		public void OnClick(Android.Views.View v){
 
-			path.Create();
+			int id = v.Id;
 
-			var testPath = path.CreateSubdirectory("tests");
-			manager = new Manager(testPath, Manager.DefaultOptions);
-		}
-
-		protected internal virtual string GetServerPath()
-		{
-			var filesDir = GetRootDirectory().FullName;
-			return filesDir;
-		}
-
-		DirectoryInfo GetRootDirectory()
-		{
-			var rootDirectoryPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData);
-			var rootDirectory = new DirectoryInfo(Path.Combine(rootDirectoryPath, "couchbase/tests/files"));
-			return rootDirectory;
-		}
-
-		Database GetDatabase(string dbName)
-		{
-			Database db = manager.GetExistingDatabase(dbName);
-			if (db != null)
-			{
-				//				var status = false;
-
-				try {
-					db.Delete ();
-					//					status = true;
-				} catch (Exception e) { 
-					//					Log.E(Tag, "Cannot delete database " + e.Message);
-				}
+			switch (id) {
+			case Resource.Id.btnReplicate:
+				StartReplication ();
+				break;
+			case Resource.Id.btnStop:
+				StopReplication ();		
+				break;
+			case Resource.Id.btnCount:
+				reviewDocuments ();
+				break;
+			case Resource.Id.btnGC:
+				callGC ();
+				break;
 			}
-			db = manager.GetDatabase(dbName);
-			return db;
+
 		}
 
+		int count = 0;
+		int lastcoutn = 0;
+		int callGCCount = 50;
+
+		void HandleChanged (object sender, Replication.ReplicationChangeEventArgs e)
+		{
+			Replication replication = e.Source;
+
+			if (replication == null)
+				return;
+
+			//Console.WriteLine("Replication : " + replication + " changed.");
+			if (!replication.IsRunning) {
+				//String msg = String.Format("Replicator {0} not running", replication);
+				//AndHUD.Shared.Dismiss (this);
+				Console.WriteLine ("I'm not Running");
+			} else {
+				float processed = (float)replication.CompletedChangesCount;
+				float total = (float)replication.ChangesCount;
+				float progress = processed / total * 100;
+
+				String msg = String.Format ("Replicator processed {0} / {1}", processed, total);
+				String msg2 = String.Format (" {0} / {1}", processed, total);
+				//button.Text = "Replicando"+msg2;
+				count = (int) processed;
+				int done = count - lastcoutn;
+				if (done > callGCCount) { //hack del inge
+					lastcoutn = count;
+					Log.D ("REPLICATION:", "reaslease mah memory");
+					GC.Collect ();
+				}
+
+				if (processed >= total) {
+					//AndHUD.Shared.Dismiss (this);
+				} else {
+					//AndHUD.Shared.Show (context: this, status: "Downloading " + progress.ToString () + "% \n" + msg2, progress: (int)progress);
+				}
+
+				Console.WriteLine (msg);
+				Log.D ("REPLICATION:", msg); //+ row.getDocumentId());
+			}
+			
+		}
+
+		void StartCBLite ()
+		{
+			if (manager == null) {
+				manager = new Manager ();//(testPath, Manager.DefaultOptions);
+			}
+
+		}
+
+		Database GetDatabase (string dbName)
+		{
+			return manager.GetDatabase (dbName);
+		}
+
+		Replication CreatePullReplication ()
+		{
+			if (database == null) {
+				database = GetDatabase (RemoteDBName);
+			}
+
+			return database.CreatePullReplication (new Uri (RemoteURLDBName));
+		}
+
+		void StartReplication ()
+		{
+			if (repls == null) {
+				repls = CreatePullReplication ();
+			}
+
+			try {
+				repls.Start ();
+			} catch (Exception e) {
+				ReleaseObjects ();
+				Log.D ("EXCEPTION TRWON:", "RESTARTING");
+			}
+				
+		}
+
+		void StopReplication ()
+		{
+			try {
+				/*foreach(Replication r in database.AllReplications){
+						r.Stop(); 
+					}*/
+				repls.Stop ();
+			} catch (Exception e) {
+				//ReleaseObjects (); 
+				repls = null;
+				Log.D ("EXCEPTION TRWON:", "STOPING");
+			}
+
+		}
+
+		void reviewDocuments ()
+		{
+			if (database == null)
+				database = GetDatabase (RemoteDBName);
+
+			try {
+				//QueryEnumerator rowEnum = query.Run ();
+				Log.D ("DOCUMENT COUNT:", " " + database.DocumentCount); //+ row.getDocumentId());
+				Toast.MakeText (this, "Docs: " + database.DocumentCount, ToastLength.Short).Show ();
+				/*foreach (QueryRow row in rowEnum) {
+					Log.D ("Document ID:", " " + row.Document.GetProperty ("nombre")); //+ row.getDocumentId());
+				}*/
+			} catch (Exception e) {
+				Log.D (Tag, e.Message + " ");
+			}
+		}
+
+		void ReleaseObjects(){
+			repls = null;
+			database = null;
+			manager.Close ();
+			GC.Collect();
+		}
+
+
+		void callGC ()
+		{
+			ReleaseObjects ();
+		}
 	}
 }
 

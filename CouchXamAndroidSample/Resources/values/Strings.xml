@@ -1,5 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<string name="hello">Hello World, Click Me!</string>
-	<string name="app_name">CouchXamAndroidSample</string>
+	<string name="app_name">CBAndroidTestAPP</string>
+	<string name="lbl_btn_replicate">Replicate</string>
+	<string name="lbl_btn_stop">Stop replicating</string>
+	<string name="lbl_btn_count">Documents count</string>
+	<string name="lbl_btn_gc">Call GC</string>
 </resources>
