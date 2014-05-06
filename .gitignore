@@ -1,0 +1,8 @@
+*~
+*.userprefs
+/bin
+*.DS_Store
+[Bb]in
+[Dd]ebug*/
+obj/
+tmp/
