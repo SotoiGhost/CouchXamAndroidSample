@@ -1,0 +1,6 @@
+/Users/israelsoto/Projects/Android/CouchXamAndroidSample/CouchXamAndroidSample/bin/Debug/CouchXamAndroidSample.dll
+/Users/israelsoto/Projects/Android/CouchXamAndroidSample/CouchXamAndroidSample/lib/AndHUD.dll
+/Users/israelsoto/Projects/Android/CouchXamAndroidSample/CouchXamAndroidSample/lib/Couchbase.Lite.Android.dll
+/Users/israelsoto/Projects/Android/CouchXamAndroidSample/CouchXamAndroidSample/lib/ICSharpCode.SharpZipLib.dll
+/Users/israelsoto/Projects/Android/CouchXamAndroidSample/CouchXamAndroidSample/lib/Newtonsoft.Json.dll
+/Users/israelsoto/Projects/Android/CouchXamAndroidSample/CouchXamAndroidSample/lib/System.Net.Http.Formatting.dll
